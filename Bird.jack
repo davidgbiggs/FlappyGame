@@ -1,0 +1,106 @@
+class Bird {
+    field int speed, x, y, height, width;
+    static int gravity;
+
+    constructor Bird new() {
+        let speed = -50;
+        let x = 150;
+        let y = 100;
+        let height = 32;
+        let width = 32;
+        let gravity = 4;
+        return this;
+    }
+
+    /** adjusts the Bird's vertical speed */
+    // method void tick(boolean didJump) {
+    //     if (didJump) {
+    //         let speed = 5;
+    //     } else if (speed > -6) {
+    //         let speed = speed - gravity;
+    //     }
+
+        // adjust the bird's position
+        // redraw the bird
+    // }
+
+    method int getY() {
+        return y;
+    }
+
+    method boolean justPassed(Pipes pipes) {
+        return (pipes.getRightBoundary() = (x - 1));
+    }
+
+    method boolean overlapsWith(Pipes pipes) {
+        var int pipeRightBoundary, pipeLeftBoundary, pipeBottomBoundary, pipeTopBoundary, birdLeft, birdRight, birdTop, birdBottom;
+        var boolean inMiddle, inLeft, inRight, inTop, inBottom, inHorizontal, inVertical;
+
+        let birdRight = x + width;
+        let birdTop = y;
+        let birdBottom = y + height;
+        let birdLeft = x;
+        let pipeRightBoundary = pipes.getRightBoundary();
+        let pipeLeftBoundary = pipes.getLeftBoundary();
+        let pipeTopBoundary = pipes.getTopBoundary();
+        let pipeBottomBoundary = pipes.getBottomBoundary();
+
+        let inMiddle = (birdLeft > pipeLeftBoundary) & (birdRight < pipeRightBoundary);
+        let inLeft = (birdRight > pipeLeftBoundary) & (birdLeft < pipeLeftBoundary);
+        let inRight = (birdLeft < pipeRightBoundary) & (birdRight > pipeRightBoundary);
+        let inVertical = (birdTop < pipeTopBoundary) | (birdBottom > pipeBottomBoundary);
+        let inHorizontal = inMiddle | inLeft | inRight;
+
+        return inHorizontal & inVertical;
+    }
+
+    method void jump() {
+        let speed = -60;
+        return;
+    }
+
+    method boolean move() {
+        var int oldY, i;
+        let oldY = y;
+        let y = y + (speed / 10);
+        if (y < 0) {
+            let y = 0;
+        }
+        let i = (speed / 10);
+
+        while (~(i = 0)) {
+            if (i < 0) {
+                // we moved up
+                // draw black lines on top
+                do Screen.setColor(true);
+                do Screen.drawLine(x, y - i, x + width, y - i);
+                // draw white lines on bottom
+                do Screen.setColor(false);
+                do Screen.drawLine(x, y + height - i, x + width, y + height - i);
+                let i = i + 1;
+            } else {
+                if (~((y + height) > 255)) {
+                    // we moved down
+                    // draw white lines on top
+                    do Screen.setColor(false);
+                    do Screen.drawLine(x, y - i, x + width, y - i);
+                    // draw black lines on bottom
+                    do Screen.setColor(true);
+                    do Screen.drawLine(x, oldY + height - i, x + width, oldY + height - i);
+                } else {
+                    return true;
+                }
+                let i = i - 1;
+            }
+        }
+        if (speed < 30) {
+            let speed = speed + gravity;
+        }
+        return false;
+    }
+
+    method void draw() {
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        return;
+    }
+}

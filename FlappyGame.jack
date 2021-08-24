@@ -1,0 +1,127 @@
+class FlappyGame {
+    field Pipes pipes1;
+    field Pipes pipes2;
+    field Bird bird;
+
+    constructor FlappyGame new() {
+        let pipes1 = Pipes.new(100);
+        let pipes2 = Pipes.new(400);
+        let bird = Bird.new();
+        return this;
+    }
+
+    method void dispose() {
+        do pipes1.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    function void showStartScreen() {
+        do Output.moveCursor(8, 26);
+        do Output.printString("Flappy Block");
+        do Output.moveCursor(10, 20);
+        do Output.printString("Controls: SPACEBAR to jump");
+        do Output.moveCursor(11, 22);
+        do Output.printString("Goal: Avoid the pipes");
+        do Output.moveCursor(13, 19);
+        do Output.printString("Press ENTER to start game");
+        return;
+    }
+
+    function void showGameOver(int score, int highScore) {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(150, 80, 300, 155);
+        do Output.moveCursor(8, 28);
+        do Output.printString("Game over");
+        do Output.moveCursor(10, 28);
+        do Output.printString("Score: ");
+        do Output.printInt(score);
+        do Output.moveCursor(11, 25);
+        do Output.printString("High Score: ");
+        do Output.printInt(highScore);
+        do Output.moveCursor(13, 19);
+        do Output.printString("Press ENTER to restart game");
+        return;
+    }
+
+    method void run() {
+        var char key;  // the key currently pressed by the user
+        var boolean exit, birdOnBottom, didJump, hasReleased, startGame, gameOver;
+        var int pipeMod, score, highScore;
+        let exit = false;
+        let score = 0;
+        let startGame = false;
+
+        do FlappyGame.showStartScreen();
+        while (~startGame) {
+            let key = Keyboard.keyPressed();
+            if (key = 128) {
+                let startGame = true;
+            }
+        }
+        do Screen.clearScreen();
+
+        do pipes1.draw();
+        do pipes2.draw();
+        do bird.draw();
+        
+        while (~exit) {
+            // waits for a key to be pressed
+            // while (key = 0) {
+            // }
+
+            let key = Keyboard.keyPressed();
+            if (key = 81)  { let exit = true; }     // q key
+            if (key = 0) { let hasReleased = true; }
+            if (key = 32) { let didJump = true; }
+            do pipes1.moveLeft();
+            do pipes2.moveLeft();
+            if (didJump & hasReleased) {
+               do bird.jump();
+               let didJump = false;
+               let hasReleased = false;
+            }
+            let birdOnBottom = bird.move();
+            // let pipeMod = bird.getY() - (3 * (bird.getY() / 3));
+
+            if (bird.justPassed(pipes1) | bird.justPassed(pipes2)) {
+                let score = score + 1;
+                if (score > highScore) {
+                    let highScore = score;
+                }
+                do Output.moveCursor(7, 13);
+                do Output.printInt(score);
+            }
+
+            do Sys.wait(10);
+            let didJump = false;
+
+            if (bird.overlapsWith(pipes1) | bird.overlapsWith(pipes2) | birdOnBottom) {
+                let gameOver = true;
+                do FlappyGame.showGameOver(score, highScore);
+                let startGame = false;
+                while (~startGame) {
+                    let key = Keyboard.keyPressed();
+                    if (key = 128) {
+                        let startGame = true;
+                        let pipes1 = Pipes.new(100);
+                        let pipes2 = Pipes.new(400);
+                        let bird = Bird.new();
+                        let score = 0;
+                        do Screen.clearScreen();
+                        do pipes1.draw();
+                        do pipes2.draw();
+                        do bird.draw();
+                    }
+                }
+                // do Screen.drawRectangle(0,0,10,10);
+            }
+
+            // waits for the key to be released
+            // while (~(key = 0)) {
+            //     let key = Keyboard.keyPressed();
+            // }
+        } // while
+        return;
+    }
+}
