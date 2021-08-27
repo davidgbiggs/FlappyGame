@@ -1,82 +1,133 @@
-class Pipes {
-    field int x;
-    static int topHeight, bottomHeight, pipesWidth;
+/** The Pipes class contains everything pertaining to the control & drawing of pipes in game. */
 
-    constructor Pipes new(int Ix) {
-        let x = Ix;
-        let topHeight = 45;
-        let bottomHeight = 105;
-        let pipesWidth = 60;
+class Pipes {
+    field int x, topHeight, bottomHeight, nextTopHeight, nextBottomHeight;
+    field boolean spawned;
+    field ExtraMath extraMath;
+    static int pipesWidth;
+
+    constructor Pipes new(int seed) {
+        let x = 511;
+        let extraMath = ExtraMath.new(seed);
+        do setVariant();
+        do setNextVariant();
+        let pipesWidth = 50;
+        let spawned = false;
         return this;
     }
 
-    method void draw() {
-        if ((x + pipesWidth) > 511) {
-            // top right
-            do Screen.drawRectangle(x, 0, 511, topHeight);
-            // bottom right
-            do Screen.drawRectangle(x, 255 - bottomHeight, 511, 255);
-            // top left
-            do Screen.drawRectangle(0, topHeight, pipesWidth - (511 - x), topHeight);
-            // bottom left
-            do Screen.drawRectangle(0, 255 - bottomHeight, pipesWidth - (511 - x), 255);
-        } else {
-            // top pipe
-            do Screen.drawRectangle(x, 0, x + pipesWidth, topHeight);
-            // bottom pipe
-            do Screen.drawRectangle(x, 255 - bottomHeight, x + pipesWidth, 255);
+    /** methods to easily set the pipe heights when rolling over to the right side of the screen */
+    method void setVariant() {
+        var int rand;
+        let rand = extraMath.nextRandom();
+        if (rand = 1) {
+            let topHeight = 45;
+            let bottomHeight = 115;
+        }
+        if (rand = 0) {
+            let topHeight = 115;
+            let bottomHeight = 45;
+        }
+        if (rand = 2) {
+            let topHeight = 80;
+            let bottomHeight = 80;
         }
         return;
     }
+    method void setNextVariant() {
+        var int rand;
+        let rand = extraMath.nextRandom();
+        if (rand = 1) {
+            let nextTopHeight = 45;
+            let nextBottomHeight = 115;
+        }
+        if (rand = 2) {
+            let nextTopHeight = 80;
+            let nextBottomHeight = 80;
+        }
+        if (rand = 0) {
+            let nextTopHeight = 115;
+            let nextBottomHeight = 45;
+        }
+        return;
+    }
+    method void iterateVariant() {
+        let topHeight = nextTopHeight;
+        let bottomHeight = nextBottomHeight;
+        do setNextVariant();
+        return;
+    }
 
+    method void spawn() {
+        let spawned = true;
+        return;
+    }
+
+    /** helper methods for hit detection */
     method int getTopBoundary() {
         return topHeight;
     }
-
     method int getBottomBoundary() {
         return 255 - bottomHeight;
     }
-
     method int getLeftBoundary() {
         return x;
     }
-
     method int getRightBoundary() {
         return x + pipesWidth;
     }
 
+    /** moveLeft draws a white line on the right side of the pipe and a black line on the left side */
     method void moveLeft() {
-        // decrement x
-        // draw black line at x
-        var int topY1, topY2, bottomY1, bottomY2, whiteX;
-        let topY1 = 0;
-        let topY2 = topHeight;
-        let bottomY1 = 255 - bottomHeight;
-        let bottomY2 = 255;
-        
-        // draw white lines at x + pipeWidth
-        if ((x + pipesWidth) > 510) {
-            let whiteX = pipesWidth - (511 - x);
-        } else {
-            let whiteX = pipesWidth + x;
+        var int topY1, topY2, bottomY1, bottomY2, nextTopY1, nextTopY2, nextBottomY1, nextBottomY2, whiteX;
+        if (spawned) {
+            let topY1 = 0;
+            let topY2 = topHeight;
+            let bottomY1 = 255 - bottomHeight;
+            let bottomY2 = 255;
+
+            if (x = 0) {
+                let x = 511;
+            } else {
+                let x = x - 1;
+            }
+
+            // overflow: we transition to potentially different pipe heights
+            if ((x + pipesWidth) > 510) {
+                let nextTopY1 = 0;
+                let nextTopY2 = nextTopHeight;
+                let nextBottomY1 = 255 - nextBottomHeight;
+                let nextBottomY2 = 255;
+
+                // draw white lines
+                let whiteX = pipesWidth - (512 - x) + 1;
+                do Screen.setColor(false);
+                do Screen.drawLine(whiteX, topY1, whiteX, topY2);
+                do Screen.drawLine(whiteX, bottomY1, whiteX, bottomY2);
+
+                // draw black lines
+                do Screen.setColor(true);
+                do Screen.drawLine(x, nextTopY1, x, nextTopY2);
+                do Screen.drawLine(x, nextBottomY1, x, nextBottomY2);
+                
+                // when finished with the old pipe heights, generate and set values for next height
+                if ((x + pipesWidth) = 511) {
+                    do iterateVariant();
+                }
+            } else { // no overflow: regular case
+
+                // draw white lines
+                let whiteX = pipesWidth + x + 1;
+                do Screen.setColor(false);
+                do Screen.drawLine(whiteX, topY1, whiteX, topY2);
+                do Screen.drawLine(whiteX, bottomY1, whiteX, bottomY2);
+                
+                // draw black line at x
+                do Screen.setColor(true);
+                do Screen.drawLine(x, topY1, x, topY2);
+                do Screen.drawLine(x, bottomY1, x, bottomY2);
+            }
         }
-        do Screen.setColor(false);
-        // top
-        do Screen.drawLine(whiteX, topY1, whiteX, topY2);
-        // bottom
-        do Screen.drawLine(whiteX, bottomY1, whiteX, bottomY2);
-        // decrement x
-        if (x = 0) {
-            let x = 510;
-        } else {
-            let x = x - 1;
-        }
-        // draw black line at x
-        do Screen.setColor(true);
-        // top right
-        do Screen.drawLine(x, topY1, x, topY2);
-        // bottom right
-        do Screen.drawLine(x, bottomY1, x, bottomY2);
         return;
     }
 

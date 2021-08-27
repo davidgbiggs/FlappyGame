@@ -1,19 +1,18 @@
+/* Written by David Biggs Aug 2021 */
+
+/** FlappyGame contains the main game loop that manipulates the Pipes and Bird classes. */
+
 class FlappyGame {
-    field Pipes pipes1;
-    field Pipes pipes2;
+    field Pipes pipes1, pipes2;
+    field int frameCount;
     field Bird bird;
 
     constructor FlappyGame new() {
-        let pipes1 = Pipes.new(100);
-        let pipes2 = Pipes.new(400);
+        let pipes1 = Pipes.new(1);
+        let pipes2 = Pipes.new(1);
+        let frameCount = 0;
         let bird = Bird.new();
         return this;
-    }
-
-    method void dispose() {
-        do pipes1.dispose();
-        do Memory.deAlloc(this);
-        return;
     }
 
     function void showStartScreen() {
@@ -47,10 +46,11 @@ class FlappyGame {
     method void run() {
         var char key;  // the key currently pressed by the user
         var boolean exit, birdOnBottom, didJump, hasReleased, startGame, gameOver;
-        var int pipeMod, score, highScore;
+        var int pipeMod, score, highScore, pipeSpacing;
         let exit = false;
         let score = 0;
         let startGame = false;
+        let pipeSpacing = 200;
 
         do FlappyGame.showStartScreen();
         while (~startGame) {
@@ -61,40 +61,42 @@ class FlappyGame {
         }
         do Screen.clearScreen();
 
-        do pipes1.draw();
-        do pipes2.draw();
         do bird.draw();
         
         while (~exit) {
-            // waits for a key to be pressed
-            // while (key = 0) {
-            // }
 
             let key = Keyboard.keyPressed();
             if (key = 81)  { let exit = true; }     // q key
-            if (key = 0) { let hasReleased = true; }
-            if (key = 32) { let didJump = true; }
+            if (key = 0) { let hasReleased = true; } // checks for release of spacebar
+            if (key = 32) { let didJump = true; } // spacebar key
+
+            // sets up the pipes using random seeds (player's position)
+            if (frameCount = 150) {
+                let pipes1 = Pipes.new(bird.getY());
+                do pipes1.spawn();
+            }
+            if (frameCount = 400) {
+                let pipes2 = Pipes.new(bird.getY());
+                do pipes2.spawn();
+            }
+
             do pipes1.moveLeft();
             do pipes2.moveLeft();
+
+            /* check game state and take appropriate actions */
             if (didJump & hasReleased) {
                do bird.jump();
                let didJump = false;
                let hasReleased = false;
             }
             let birdOnBottom = bird.move();
-            // let pipeMod = bird.getY() - (3 * (bird.getY() / 3));
 
             if (bird.justPassed(pipes1) | bird.justPassed(pipes2)) {
                 let score = score + 1;
                 if (score > highScore) {
                     let highScore = score;
                 }
-                do Output.moveCursor(7, 13);
-                do Output.printInt(score);
             }
-
-            do Sys.wait(10);
-            let didJump = false;
 
             if (bird.overlapsWith(pipes1) | bird.overlapsWith(pipes2) | birdOnBottom) {
                 let gameOver = true;
@@ -104,24 +106,32 @@ class FlappyGame {
                     let key = Keyboard.keyPressed();
                     if (key = 128) {
                         let startGame = true;
-                        let pipes1 = Pipes.new(100);
-                        let pipes2 = Pipes.new(400);
+                        let pipes1 = Pipes.new(0);
+                        let pipes2 = Pipes.new(1);
+                        let frameCount = 0;
                         let bird = Bird.new();
                         let score = 0;
                         do Screen.clearScreen();
-                        do pipes1.draw();
-                        do pipes2.draw();
                         do bird.draw();
                     }
                 }
-                // do Screen.drawRectangle(0,0,10,10);
             }
 
-            // waits for the key to be released
-            // while (~(key = 0)) {
-            //     let key = Keyboard.keyPressed();
-            // }
+            do Output.moveCursor(10, 13);
+            do Output.printInt(score);
+
+            // slow the game down a bit for playability
+            do Sys.wait(10);
+            let didJump = false;
+            let frameCount = frameCount + 1;
+
         } // while
+        return;
+    }
+
+    method void dispose() {
+        do pipes1.dispose();
+        do Memory.deAlloc(this);
         return;
     }
 }

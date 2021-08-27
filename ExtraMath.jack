@@ -1,0 +1,23 @@
+/** ExtraMath contains a function to generate random numbers, and a modulus helper function. */
+
+class ExtraMath {
+    field int random;
+
+    constructor ExtraMath new(int seed) {
+        let random = seed;
+        return this;
+    }
+
+    function int mod(int dividend, int divisor) {
+        return dividend - (divisor * (dividend / divisor));
+    }
+
+    method int nextRandom() {
+        let random = ExtraMath.mod(((11411 * random) + 20873), 1000);
+        if (random < 0) {
+            return ExtraMath.mod(-random, 3);
+        } else {
+            return ExtraMath.mod(random, 3);
+        }
+    }
+}

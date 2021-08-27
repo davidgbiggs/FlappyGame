@@ -1,3 +1,5 @@
+/** The Bird class contains everything pertaining to the control & drawing of the bird (or block) in game. */
+
 class Bird {
     field int speed, x, y, height, width;
     static int gravity;
@@ -12,26 +14,16 @@ class Bird {
         return this;
     }
 
-    /** adjusts the Bird's vertical speed */
-    // method void tick(boolean didJump) {
-    //     if (didJump) {
-    //         let speed = 5;
-    //     } else if (speed > -6) {
-    //         let speed = speed - gravity;
-    //     }
-
-        // adjust the bird's position
-        // redraw the bird
-    // }
-
     method int getY() {
         return y;
     }
 
+    /** for iterating the score of the game */
     method boolean justPassed(Pipes pipes) {
         return (pipes.getRightBoundary() = (x - 1));
     }
 
+    /** collision detection */
     method boolean overlapsWith(Pipes pipes) {
         var int pipeRightBoundary, pipeLeftBoundary, pipeBottomBoundary, pipeTopBoundary, birdLeft, birdRight, birdTop, birdBottom;
         var boolean inMiddle, inLeft, inRight, inTop, inBottom, inHorizontal, inVertical;
@@ -68,6 +60,7 @@ class Bird {
         }
         let i = (speed / 10);
 
+        // draws as many lines as the speed requires
         while (~(i = 0)) {
             if (i < 0) {
                 // we moved up
