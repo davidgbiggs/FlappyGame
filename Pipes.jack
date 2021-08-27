@@ -1,0 +1,87 @@
+class Pipes {
+    field int x;
+    static int topHeight, bottomHeight, pipesWidth;
+
+    constructor Pipes new(int Ix) {
+        let x = Ix;
+        let topHeight = 45;
+        let bottomHeight = 105;
+        let pipesWidth = 60;
+        return this;
+    }
+
+    method void draw() {
+        if ((x + pipesWidth) > 511) {
+            // top right
+            do Screen.drawRectangle(x, 0, 511, topHeight);
+            // bottom right
+            do Screen.drawRectangle(x, 255 - bottomHeight, 511, 255);
+            // top left
+            do Screen.drawRectangle(0, topHeight, pipesWidth - (511 - x), topHeight);
+            // bottom left
+            do Screen.drawRectangle(0, 255 - bottomHeight, pipesWidth - (511 - x), 255);
+        } else {
+            // top pipe
+            do Screen.drawRectangle(x, 0, x + pipesWidth, topHeight);
+            // bottom pipe
+            do Screen.drawRectangle(x, 255 - bottomHeight, x + pipesWidth, 255);
+        }
+        return;
+    }
+
+    method int getTopBoundary() {
+        return topHeight;
+    }
+
+    method int getBottomBoundary() {
+        return 255 - bottomHeight;
+    }
+
+    method int getLeftBoundary() {
+        return x;
+    }
+
+    method int getRightBoundary() {
+        return x + pipesWidth;
+    }
+
+    method void moveLeft() {
+        // decrement x
+        // draw black line at x
+        var int topY1, topY2, bottomY1, bottomY2, whiteX;
+        let topY1 = 0;
+        let topY2 = topHeight;
+        let bottomY1 = 255 - bottomHeight;
+        let bottomY2 = 255;
+        
+        // draw white lines at x + pipeWidth
+        if ((x + pipesWidth) > 510) {
+            let whiteX = pipesWidth - (511 - x);
+        } else {
+            let whiteX = pipesWidth + x;
+        }
+        do Screen.setColor(false);
+        // top
+        do Screen.drawLine(whiteX, topY1, whiteX, topY2);
+        // bottom
+        do Screen.drawLine(whiteX, bottomY1, whiteX, bottomY2);
+        // decrement x
+        if (x = 0) {
+            let x = 510;
+        } else {
+            let x = x - 1;
+        }
+        // draw black line at x
+        do Screen.setColor(true);
+        // top right
+        do Screen.drawLine(x, topY1, x, topY2);
+        // bottom right
+        do Screen.drawLine(x, bottomY1, x, bottomY2);
+        return;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}
