@@ -1,7 +1,7 @@
 # FlappyGame
 
-A game written in [Jack.](https://en.everybodywiki.com/Jack_(programming_language)  
-Running the game would require [downloading the Nand2Tetris software suite](https://www.nand2tetris.org/software)  
+A game written in [Jack.](<https://en.everybodywiki.com/Jack_(programming_language)>)
+Running the game would require [downloading the Nand2Tetris software suite.](https://www.nand2tetris.org/software)  
 However, I imagine most people just want to see it in action: [video here.](https://www.loom.com/share/1f78c7437aa34cac8af9a2fa5db60d80)
 
 This project was peer graded. Here is some feedback from my peers who also took the Nand2Tetris course:
