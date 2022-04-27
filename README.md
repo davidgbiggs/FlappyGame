@@ -8,7 +8,7 @@ This project was peer graded. Here is some feedback from my peers who also took 
 
 **Andrew Arena**
 
-> Wowza. You employ several clever techniques alongside some cool math and an admirable level of precision and organization to make this program. For example, I see you created your own modulo operation using the fact that (int x / int y) \* int y != int x , and then used it to create pseudo-random pipe generation. Also, I think how you created a variable called "speed" in the bird object and then used it to tell whether or not your bird was moving upwards and then translated your bird accordingly was pretty interesting. I feel like I could spend a very long time studying this and still not understand how all of it works. This program demonstrated how awesome object based programming can be.
+> Wowza. You employ several clever techniques alongside some cool math and an admirable level of precision and organization to make this program. For example, I see you created your own modulo operation using the fact that (int x / int y) \* int y != int x , and then used it to create pseudo-random pipe generation. Also, I think how you created a variable called "speed" in the bird object and then used it to tell whether or not your bird was moving upwards and then translated your bird accordingly was pretty interesting. I feel like I you spent a long time working on some quite complex features but somehow kept it simple. This program demonstrated how awesome object based programming can be.
 
 **Goutam Kumar Jha**
 
