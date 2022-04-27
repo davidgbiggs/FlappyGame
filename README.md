@@ -12,4 +12,4 @@ This project was peer graded. Here is some feedback from my peers who also took 
 
 **Goutam Kumar Jha**
 
-> Game structure is good, I have tried to play the game but I think I need more practice to cross the pipes. Overall, great work!
+> Game structure is good, I have tried to play the game but I think I need more practice to cross the pipes. Overall, great work!!
